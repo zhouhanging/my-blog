@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
+from app.database import engine, Base, init_db
 from app.api import blogs
 
-Base.metadata.create_all(bind=engine)
+init_db()
 
 app = FastAPI(title="AI 博客系统 API")
 

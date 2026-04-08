@@ -1,8 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 load_dotenv()
 
@@ -14,6 +13,11 @@ engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+def init_db():
+    """初始化数据库，创建所有表"""
+    from app.models.blog import Blog
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()

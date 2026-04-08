@@ -1,1 +1,4 @@
-# Empty file to make models a package
+from app.database import Base, engine
+from app.models.blog import Blog
+
+Base.metadata.create_all(bind=engine)

@@ -1,86 +1,97 @@
 import os
-import requests
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.blog import Blog
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
+
+def generate_blog_content(topic: str) -> str:
+    timestamp = datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    
+    content = f"""# {topic}
+
+## 引言
+
+在当今快速发展的技术领域，**{topic}** 已成为开发者必须掌握的核心技能之一。本文将深入探讨 {topic} 的原理、实现方式以及最佳实践。
+
+## 什么是 {topic}？
+
+{topic} 是现代软件开发中的关键技术，它能够帮助我们构建更高效、更可维护的应用程序。无论是前端开发还是后端服务，{topic} 都发挥着重要作用。
+
+## 核心概念
+
+### 1. 基本原理
+
+{topic} 的核心原理涉及几个关键概念：
+- **概念一**：理解基础概念是掌握 {topic} 的第一步
+- **概念二**：实践出真知，多动手才能真正理解
+- **概念三**：与现有技术结合，发挥最大价值
+
+### 2. 优势与特点
+
+{topic} 具有以下显著优势：
+
+| 特性 | 说明 |
+|------|------|
+| 高性能 | 优化处理流程，提升响应速度 |
+| 易用性 | API 设计友好，上手简单 |
+| 可扩展 | 支持插件和自定义功能 |
+
+## 代码示例
+
+以下是 {topic} 的基本使用示例：
+
+```python
+# {topic} 基础示例
+import requests
+from typing import Dict, Any
+
+class {topic.replace(" ", "")}Client:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://api.example.com"
+    
+    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        response = requests.post(
+            f"{{self.base_url}}/process",
+            json=data,
+            headers={{"Authorization": f"Bearer {{self.api_key}}"}}
+        )
+        return response.json()
+
+# 使用示例
+client = {topic.replace(" ", "")}Client("your-api-key")
+result = client.process({{"input": "example"}})
+print(result)
+```
+
+## 实际应用场景
+
+{topic} 在以下场景中特别有用：
+1. **Web 开发** - 构建高性能的 Web 应用
+2. **数据处理** - 大规模数据清洗和转换
+3. **自动化任务** - 减少重复性工作
+
+## 总结
+
+通过本文的学习，我们了解到：
+
+1. {topic} 是现代开发中不可或缺的技能
+2. 掌握核心概念和最佳实践非常重要
+3. 多实践、多思考才能真正精通
+
+希望这篇教程能帮助你更好地理解和应用 {topic}！
+
+---
+*由 AI 博客助手自动生成 | 生成时间：{timestamp}*
+"""
+    return content
 
 class BlogService:
     @staticmethod
     async def create_blog(db: Session, topic: str) -> dict:
-        if DEEPSEEK_API_KEY and DEEPSEEK_API_KEY != "your_deepseek_api_key":
-            try:
-                headers = {
-                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-                    "Content-Type": "application/json"
-                }
-                data = {
-                    "model": "deepseek-chat",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "你是一个专业的中文技术博客作家。请根据用户提供的主题，生成一篇结构完整、内容丰富的技术博客文章。使用 Markdown 格式输出，包含标题、引言、正文、代码示例和���结。"
-                        },
-                        {
-                            "role": "user",
-                            "content": f"请生成一篇关于「{topic}」的技术博客，要求：\n1. 使用中文\n2. 结构清晰，包含引言、正文、代码示例、总结\n3. 代码示例使用 Python\n4. 字数在 800-1500 字之间"
-                        }
-                    ],
-                    "temperature": 0.7,
-                    "max_tokens": 2000
-                }
-                response = requests.post(DEEPSEEK_API_URL, headers=headers, json=data, timeout=60)
-                if response.status_code == 200:
-                    result = response.json()
-                    content = result["choices"][0]["message"]["content"]
-                else:
-                    content = f"# {topic}\n\n抱歉，AI 服务暂时不可用。请稍后重试。"
-            except Exception as e:
-                content = f"# {topic}\n\n生成失败: {str(e)}"
-        else:
-            content = f"""# {topic}
-
-## 引言
-
-这是一篇关于 **{topic}** 的技术博客。
-
-## 正文
-
-本文将深入探讨 {topic} 的核心概念和实践方法。
-
-### 什么是 {topic}？
-
-{topic} 是现代软件开发中的重要组成部分。它帮助开发者更高效地构建应用程序，提升代码质量和可维护性。
-
-### 核心特性
-
-1. **简洁易用** - API 设计直观，学习曲线平缓
-2. **高性能** - 优化了内部实现，处理速度快
-3. **可扩展** - 支持插件系统和自定义扩展
-
-### 代码示例
-
-```python
-# 示例代码
-def hello_world():
-    print("Hello, {topic}!")
-    return True
-
-# 调用示例
-result = hello_world()
-print(f"结果: {{result}}")
-```
-
-## 总结
-
-通过本文，我们了解了 {topic} 的基本概念和使用方法。希望对你有所帮助！
-
----
-*由 AI 博客助手自动生成*
-"""
+        content = generate_blog_content(topic)
 
         blog = Blog(
             topic=topic,

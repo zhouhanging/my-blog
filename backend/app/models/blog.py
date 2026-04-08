@@ -1,15 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Enum as SQLEnum
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from app.database import Base
 from datetime import datetime
-import enum
-
-Base = declarative_base()
-
-class BlogStatus(str, enum.Enum):
-    DRAFT = "draft"
-    PENDING = "pending"
-    APPROVED = "approved"
-    PUBLISHED = "published"
 
 class Blog(Base):
     __tablename__ = "blogs"
