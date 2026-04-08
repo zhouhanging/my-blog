@@ -1,0 +1,128 @@
+{
+  "name": "AI 博客审核通过推送",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "approve",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "blog-approve"
+    },
+    {
+      "parameters": {
+        "url": "https://your-strapi-api.com/api/articles",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_STRAPI_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $json.topic }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "status",
+              "value": "published"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "推送到 Strapi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.weixin.qq.com/cgi-bin/material/add_news",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "body": "={{ { \"articles\": [{ \"title\": $json.topic, \"content\": $json.content, \"digest\": \"AI 博客助手生成\", \"author\": \"AI\", \"show_cover_pic\": 0 }] } }}",
+        "options": {}
+      },
+      "name": "推送到微信公众号",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 日志记录\nconst data = $input.first().json;\nconsole.log('博客审核通过:', data);\nreturn [{json: {success: true, message: '推送完成', blog_id: data.blog_id}}];"
+      },
+      "name": "日志记录",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "推送到 Strapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "推送到 Strapi": {
+      "main": [
+        [
+          {
+            "node": "推送到微信公众号",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "推送到微信公众号": {
+      "main": [
+        [
+          {
+            "node": "日志记录",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # 后端 API
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/my_blog_db
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY}
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678/webhook/approve}
+    volumes:
+      - ./backend/app:/app/app
+
+  # 数据库
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=my_blog_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
