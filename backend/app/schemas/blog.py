@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
-from app.models.blog import BlogStatus
 
 class BlogBase(BaseModel):
     topic: str
@@ -12,12 +11,12 @@ class BlogCreate(BlogBase):
 
 class BlogUpdate(BaseModel):
     content: Optional[str] = None
-    status: Optional[BlogStatus] = None
+    status: Optional[str] = None
     feedback: Optional[str] = None
 
 class BlogResponse(BlogBase):
     id: int
-    status: BlogStatus
+    status: str
     feedback: Optional[str] = None
     created_at: datetime
     updated_at: datetime

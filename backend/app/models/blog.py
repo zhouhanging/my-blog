@@ -17,7 +17,7 @@ class Blog(Base):
     id = Column(Integer, primary_key=True, index=True)
     topic = Column(String(255), nullable=False)
     content = Column(Text, nullable=False)
-    status = Column(SQLEnum(BlogStatus), default=BlogStatus.DRAFT)
+    status = Column(String, default="pending")
     feedback = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
